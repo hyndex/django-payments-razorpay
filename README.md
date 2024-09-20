@@ -56,7 +56,7 @@ pip install git+https://github.com/hyndex/django-payments-razorpay.git
 Install the package using `pip`:
 
 ```bash
-pip install django-payments-razorpay
+pip install git+https://github.com/hyndex/django-payments-razorpay.git
 ```
 
 ### 2. Add to Installed Apps
