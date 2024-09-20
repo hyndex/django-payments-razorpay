@@ -1,3 +1,5 @@
 # MANIFEST.in
 
 include payments_razorpay/templates/payments/razorpay.html
+include LICENSE
+include README.md

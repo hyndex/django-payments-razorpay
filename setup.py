@@ -9,8 +9,8 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Your Name',
-    author_email='your.email@example.com',
-    url='https://github.com/yourusername/django-payments-razorpay',
+    author_email='dikibhuyan@gmail.com',
+    url='https://github.com/hyndex/django-payments-razorpay',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
