@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.py
+django_payments_razorpay_backend.egg-info/PKG-INFO
+django_payments_razorpay_backend.egg-info/SOURCES.txt
+django_payments_razorpay_backend.egg-info/dependency_links.txt
+django_payments_razorpay_backend.egg-info/requires.txt
+django_payments_razorpay_backend.egg-info/top_level.txt
+payments_razorpay/__init__.py
+payments_razorpay/razorpay_provider.py
+payments_razorpay/templates/payments/razorpay.html

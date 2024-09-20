@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='django-payments-razorpay',
+    name='django-payments-razorpay-backend',
     version='0.1.0',
     description='Razorpay payment provider for django-payments',
     long_description=open('README.md').read(),
