@@ -1,0 +1,3 @@
+# MANIFEST.in
+
+include payments_razorpay/templates/payments/razorpay.html

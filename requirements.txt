@@ -1,0 +1,6 @@
+# requirements.txt
+
+django-payments>=0.14.0
+razorpay>=1.3.0
+Django>=2.2
+djangorestframework>=3.11.0  # If using DRF
