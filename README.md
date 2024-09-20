@@ -38,7 +38,7 @@ Razorpay payment provider for [django-payments](https://github.com/django-oscar/
 ## Installation
 
 ```bash
-pip install django-payments-razorpay-backend
+pip install git+https://github.com/hyndex/django-payments-razorpay.git
 ```
 
 ## Requirements
