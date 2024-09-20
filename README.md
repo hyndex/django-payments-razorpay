@@ -1,15 +1,5 @@
 # django-payments-razorpay
 
-Razorpay payment provider for [django-payments](https://github.com/django-oscar/django-payments).
-
-## Installation
-
-```bash
-pip install django-payments-razorpay
-
-
-# django-payments-razorpay
-
 [![PyPI version](https://badge.fury.io/py/django-payments-razorpay.svg)](https://badge.fury.io/py/django-payments-razorpay)
 
 Razorpay payment provider for [django-payments](https://github.com/django-oscar/django-payments), compatible with both traditional Django views and Django REST Framework (DRF).
@@ -31,6 +21,7 @@ Razorpay payment provider for [django-payments](https://github.com/django-oscar/
   - [4. Create DRF Views](#4-create-drf-views)
   - [5. Update URLs](#5-update-urls)
   - [6. Update Frontend](#6-update-frontend)
+- [Fix for JavaScript Syntax Errors](#fix-for-javascript-syntax-errors)
 - [Testing](#testing)
 - [Security Considerations](#security-considerations)
 - [Additional Notes](#additional-notes)
@@ -56,6 +47,7 @@ pip install django-payments-razorpay
 - Django 2.2+
 - django-payments 0.14.0+
 - razorpay 1.3.0+
+- djangorestframework 3.11.0+ (if using DRF)
 
 ## Getting Started
 
@@ -104,6 +96,7 @@ Add the necessary URLs to handle the payment process. In your `urls.py`:
 ```python
 from django.urls import path
 from payments import views as payment_views
+from your_app.views import start_payment
 
 urlpatterns = [
     # ...
@@ -111,6 +104,7 @@ urlpatterns = [
     path('payment/<int:payment_id>/process/', payment_views.process_payment, name='process_payment'),
     path('payment/<int:payment_id>/done/', payment_views.payment_successful, name='payment_successful'),
     path('payment/<int:payment_id>/failed/', payment_views.payment_failed, name='payment_failed'),
+    path('start-payment/<int:order_id>/', start_payment, name='start_payment'),
     # ...
 ]
 ```
@@ -171,6 +165,8 @@ Create a template at `templates/payment.html` with the following content:
 #### b. Razorpay Template
 
 The package includes a Razorpay-specific template at `payments/razorpay.html`, which is used by the provider.
+
+**Note:** If you encounter JavaScript syntax errors related to the `"notes"` field in the template, see the [Fix for JavaScript Syntax Errors](#fix-for-javascript-syntax-errors) section below.
 
 ## Usage with Django REST Framework
 
@@ -347,9 +343,73 @@ In the `handler` function of the Razorpay options, send the payment details back
 
 ### 7. Frontend Integration Notes
 
+- **Include Razorpay Script:** Ensure you include the Razorpay Checkout script in your HTML or load it dynamically.
+
+  ```html
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  ```
+
 - **CSRF Protection:** Since DRF's `APIView` does not enforce CSRF checks, you don't need to handle CSRF tokens unless you're mixing session-based authentication.
 - **Authentication:** If your API requires authentication, ensure that your frontend includes the necessary tokens or credentials in the headers.
 - **Error Handling:** Update your frontend to handle different response statuses and display appropriate messages to the user.
+
+## Fix for JavaScript Syntax Errors
+
+If you encounter JavaScript syntax errors in the `razorpay.html` template, specifically related to the `"notes"` field, you need to ensure that the `notes` dictionary is properly serialized into JSON.
+
+### Problem Explanation
+
+The error occurs because the `notes` field is rendered as a Python dictionary, which is not valid JavaScript syntax.
+
+### Solution
+
+#### Step 1: Modify the Provider's `get_form` Method
+
+In `payments_razorpay/razorpay_provider.py`, import the `json` module and serialize the `notes` dictionary:
+
+```python
+import json
+
+class RazorpayProvider(BasicProvider):
+    # ... existing code ...
+
+    def get_form(self, payment, data=None):
+        # ... existing code ...
+
+        notes = {
+            'email': payment.billing_email or '',
+            'phone': payment.billing_phone or '',
+        }
+
+        # Serialize the notes dictionary to a JSON-formatted string
+        notes_json = json.dumps(notes)
+
+        # Update the initial data
+        initial = {
+            # ... existing fields ...
+            'notes': notes_json,
+            # ... existing fields ...
+        }
+
+        # ... existing code ...
+```
+
+#### Step 2: Update the Template
+
+In `payments_razorpay/templates/payments/razorpay.html`, ensure the `notes` field is rendered correctly:
+
+```html
+<script>
+    var options = {
+        // ... existing fields ...
+        "notes": {{ form.initial.notes|safe }},
+        // ... existing fields ...
+    };
+    // ... existing code ...
+</script>
+```
+
+By properly serializing the `notes` dictionary into JSON and rendering it safely into your JavaScript code, you resolve the syntax errors.
 
 ## Testing
 
@@ -373,7 +433,7 @@ Before deploying to production, thoroughly test the payment flow:
 - **Refunds:** The `refund` method is implemented in the provider. You can call `payment.refund()` to process refunds.
 - **Auto-Capture:** The provider is set to auto-capture payments. If you need manual capture, adjust the `payment_capture` parameter.
 - **Customizations:** Feel free to customize the payment form and frontend as per your application's requirements.
-- **Support:** For any issues or questions, please open an issue on the [GitHub repository](https://github.com/yourusername/django-payments-razorpay).
+- **Support:** For any issues or questions, please open an issue on the [GitHub repository](https://github.com/hyndex/django-payments-razorpay).
 
 ## License
 
@@ -399,3 +459,9 @@ djangorestframework>=3.11.0  # If using DRF
 By following this guide, you can integrate Razorpay payments into your Django application using `django-payments-razorpay`, whether you're using traditional Django views or Django REST Framework. Remember to replace placeholder values like API keys with your actual credentials and customize the code as needed for your application.
 
 Feel free to contribute to the package by submitting pull requests or opening issues on GitHub.
+
+---
+
+**GitHub Repository:** [hyndex/django-payments-razorpay](https://github.com/hyndex/django-payments-razorpay)
+
+**PyPI Package:** [django-payments-razorpay](https://pypi.org/project/django-payments-razorpay/)
